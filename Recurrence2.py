@@ -10,23 +10,43 @@ import matplotlib.pyplot as plt
 import numpy as np
 import math
 from scipy.special import factorial
+from matplotlib.ticker import MaxNLocator
 
-n = np.arange(2., 20., 1)
 
-fig, ax = plt.subplots(figsize=(10, 7), dpi=300)
-ax.plot(n, 15*n**2, color='red', label='15n^2', linewidth=3)
-ax.plot(n, 8*n**3, color='blue', label='8n^3', linewidth=3)
-ax.plot(n, 2**n, color='green', label='2^n', linewidth=3)
-ax.plot(n, 3**n, color='orange', label='3^n', linewidth=3)
-ax.plot(n, factorial((n)), color='violet', label='n!', linewidth=3)
-ax.plot(n, n*np.log2(n), color='cyan', label='nlogn', linewidth=3)
-ax.legend(loc='upper left', shadow=True)
-# plt.savefig('accuracy.png')
-ax.set_title('Comparision')
-ax.set_xlabel('n, {2, ..., 20}')
-ax.set_ylabel('T(n)')
-ax.set_ylim(bottom=0, top = 100000)
-ax.set_xlim(left=2)
+def Prob(n,j):
+    First = factorial(n)/(factorial(j)*factorial(n-j))
+    return First*((1/n)**j)*((1-(1/n))**(n-j))
+
+N = 100
+  
+A = np.zeros(shape=[1,N+1],dtype=float)        
+A[0,1] = 1
+A[0,2] = 2
+    
+for i in range(3,N+1):
+    G = 1
+    for j in range(2,i):         
+        G = G + A[0,j] * Prob(i,j)
+    D = 1 - Prob(i,0) - Prob(i,i)  
+    A[0,i] = G/D
+            
+L = A[0,2:]
+    
+n=[]
+for i in range(len(L)):
+    n.append(i+2)
+    print("L[{}] = {}".format(i+2,L[i]))
+
+
+fig, ax = plt.subplots(figsize=(10, 6), dpi=300)
+ax.plot(n[1:], L[1:], color='blue', linewidth=3)
+ax.set_title('L(n)', fontweight="bold", fontsize=24)
+ax.set_xlabel('n', fontweight="bold", fontsize=24)
+ax.set_ylabel('L(n)', fontweight="bold", fontsize=24)
+#ax.set_ylim(bottom=0)
+ax.xaxis.set_major_locator(MaxNLocator(integer=True))
+ax.set_xlim(left=0)
 ax.grid(True)
 #plt.yscale("log")
 plt.show()
+
